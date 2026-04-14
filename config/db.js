@@ -18,7 +18,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   // SSL only needed for public proxy; internal connections don't require it
-  ssl: host?.includes('proxy.rlwy.net') ? { rejectUnauthorized: false } : undefined
+ssl: host?.includes('proxy.rlwy.net') ? { rejectUnauthorized: false } : false
 });
 
 module.exports = pool.promise();
