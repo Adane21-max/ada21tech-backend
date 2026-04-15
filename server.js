@@ -23,7 +23,7 @@ db.getConnection()
   });
 
 // Routes
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth.js');
 const subjectRoutes = require('./routes/subjects');
 const questionRoutes = require('./routes/questions');
 const freeTrialRoutes = require('./routes/freeTrial');
