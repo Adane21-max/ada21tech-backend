@@ -48,14 +48,14 @@ app.use('/api/question-types', questionTypeRoutes);
 app.use('/api/attempts', attemptRoutes);
 
 // =====================
-// TEST ROUTE
+// HEALTH CHECK
 // =====================
 app.get('/', (req, res) => {
   res.send('Ada21Tech API is running...');
 });
 
 // =====================
-// INIT DB (IMPORTANT FIX)
+// INIT DB (SAFE - ONLY FIRST TIME)
 // =====================
 app.get('/init-db', async (req, res) => {
   try {
@@ -68,12 +68,7 @@ app.get('/init-db', async (req, res) => {
       )
     `);
 
-    await db.query(`
-      INSERT IGNORE INTO users (username, password, role)
-      VALUES ('admin', '123456', 'admin')
-    `);
-
-    res.send('Database initialized successfully');
+    res.send('Users table ready');
   } catch (err) {
     console.error(err);
     res.status(500).send('DB init failed');
