@@ -1,43 +1,59 @@
-﻿const db = require('../config/db'); // FIXED PATH
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+﻿require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
 
-exports.register = async (req, res) => {
-  try {
-    const { username, password, role } = req.body;
-    if (!username || !password) return res.status(400).json({ message: 'Username and password required' });
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+// Middleware
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : 'http://localhost:5173',
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
 
-    await db.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username, hashedPassword, role || 'student']);
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+// Import routes
+const authRoutes = require('./routes/auth');
+const subjectRoutes = require('./routes/subjects');
+const questionRoutes = require('./routes/questions');
+const freeTrialRoutes = require('./routes/freeTrial');
+const announcementRoutes = require('./routes/announcements');
+const studentRoutes = require('./routes/students');
+const paymentRoutes = require('./routes/payments');
+const questionTypeRoutes = require('./routes/questionTypes');
+const attemptRoutes = require('./routes/attempts');
 
-exports.login = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+// Use routes
+app.use('/api/auth', authRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/questions', questionRoutes);
+app.use('/api/free-trial', freeTrialRoutes);
+app.use('/api/announcements', announcementRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/question-types', questionTypeRoutes);
+app.use('/api/attempts', attemptRoutes);
 
-    if (rows.length === 0) return res.status(401).json({ message: 'Invalid credentials' });
+// Test route
+app.get('/', (req, res) => {
+  res.send('Ada21Tech API is running...');
+});
 
-    const user = rows[0];
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(401).json({ message: 'Invalid credentials' });
+// Global error handlers
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+});
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '7d' }
-    );
+// Start server
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-    res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+server.on('error', (err) => {
+  console.error('SERVER ERROR:', err);
+});
