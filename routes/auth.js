@@ -2,6 +2,7 @@
 const router = express.Router();
 const { register, login } = require('../controllers/authController');
 
+// Routes for REAL EDU authentication
 router.post('/register', register);
 router.post('/login', login);
 
