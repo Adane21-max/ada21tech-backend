@@ -1,5 +1,4 @@
 ﻿// Remove dotenv on Render – environment variables are injected directly
-// require('dotenv').config();   <-- COMMENT OUT OR DELETE THIS LINE
 
 const express = require('express');
 const cors = require('cors');
