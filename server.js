@@ -1,4 +1,6 @@
-﻿require('dotenv').config();
+﻿// Remove dotenv on Render – environment variables are injected directly
+// require('dotenv').config();   <-- COMMENT OUT OR DELETE THIS LINE
+
 const express = require('express');
 const cors = require('cors');
 
@@ -8,7 +10,6 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use('/uploads', express.static('uploads'));
 
 // DB
@@ -17,11 +18,12 @@ const db = require('./config/db');
 // Safe DB check
 db.getConnection()
   .then(conn => {
-    console.log('MySQL Connected');
+    console.log('✅ MySQL Connected via pool');
     conn.release();
   })
   .catch(err => {
-    console.error('MySQL Connection Failed:', err.message);
+    console.error('❌ MySQL Connection Failed:', err.message);
+    // Don't exit – allow server to start so we can see logs
   });
 
 // =====================
@@ -52,27 +54,6 @@ app.use('/api/attempts', attemptRoutes);
 // =====================
 app.get('/', (req, res) => {
   res.send('Ada21Tech API is running...');
-});
-
-// =====================
-// INIT DB (SAFE - ONLY FIRST TIME)
-// =====================
-app.get('/init-db', async (req, res) => {
-  try {
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(100) UNIQUE,
-        password VARCHAR(255),
-        role VARCHAR(50) DEFAULT 'student'
-      )
-    `);
-
-    res.send('Users table ready');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('DB init failed');
-  }
 });
 
 // =====================
