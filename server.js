@@ -54,7 +54,12 @@ app.use('/api/attempts', attemptRoutes);
 app.get('/', (req, res) => {
   res.send('Ada21Tech API is running...');
 });
-
+app.get('/api/check-secret', (req, res) => {
+  res.json({ secret: process.env.JWT_SECRET ? 'SET' : 'MISSING' });
+});
+app.get('/api/ping', (req, res) => {
+  res.json({ message: 'pong', env: !!process.env.JWT_SECRET, db: !!process.env.DB_HOST });
+});
 // =====================
 // 404 HANDLER
 // =====================
