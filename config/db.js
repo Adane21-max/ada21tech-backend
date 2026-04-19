@@ -1,11 +1,10 @@
 ﻿const mysql = require('mysql2');
 
-// Hardcode the correct database name
 const host = process.env.DB_HOST;
 const port = process.env.DB_PORT;
 const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD;
-const database = 'test';   // <-- FORCE test
+const database = 'defaultdb';   // <-- FORCE defaultdb
 
 console.log('🔄 Attempting MySQL connection (TiDB):');
 console.log(`   Host: ${host}`);
@@ -31,15 +30,12 @@ const pool = mysql.createPool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Test connection and list tables
 pool.getConnection((err, connection) => {
   if (err) {
     console.error('❌ MySQL Connection Failed:', err.message);
     return;
   }
   console.log('✅ MySQL Connected successfully');
-  
-  // Query to list tables
   connection.query('SHOW TABLES', (err2, results) => {
     if (err2) {
       console.error('❌ SHOW TABLES Error:', err2.message);
