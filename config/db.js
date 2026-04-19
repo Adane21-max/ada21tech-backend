@@ -4,7 +4,7 @@ const host = process.env.DB_HOST;
 const port = process.env.DB_PORT;
 const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD;
-const database = 'test';
+const database = 'ada21tech_prod';
 console.log('🔄 Attempting MySQL connection (TiDB):');
 console.log(`   Host: ${host}`);
 console.log(`   Port: ${port}`);
